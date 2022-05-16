@@ -1,67 +1,195 @@
+let protobuf = require("protobufjs");
+
+var bodyParser = require('body-parser')
+const zlib = require('zlib');
 const express = require('express')
 const app = express()
 const port = 3000
 
-const mysql = require('mysql')
+let fse = require('fs-extra');
+/*
+let mysql = require('mysql2')
 const connection = mysql.createConnection(
     {
         host: 'localhost',
-        user: 'root',
-        password: 'msdroot', // not production password, only works for local DB
+        user: 'develop',
+        password: 'dirsroot', // not production password, only works for local DB
         database: 'MSD_Backend'
     }
 )
 
-connection.connect()
-
-connection.query('SELECT * FROM Radiometers', (err, res, fields) =>
+connection.connect((err =>
 {
-    if(err) throw err;
-    console.log(res)
+    if (err) throw err;
+}))
+*/
+// connection.query('SELECT * FROM Radiometers', (err, res, fields) =>
+// {
+//     if (err) throw err;
+//     console.log(res)
+// })
+
+let root = protobuf.loadSync('./hourly.proto');
+let HourlyDataMessage = root.lookupType("HourlyData");
+
+
+
+
+app.use(bodyParser.raw(
+    {
+        inflate: true,
+        limit: '20mb',
+        type: 'application/octet-stream'
+    }))
+
+app.get('/utcnow', (req, res) =>
+{
+    console.log((new Date()).toUTCString());
+    res.status(200).send("" + Math.floor(Date.now() / 1000));
+//    res.status(200).send("1644623640");   // Feb 10 5:56:00 
+//    res.status(200).send("1638748200"); // Dec 5 11:50:00 
+//    res.status(200).send("1638748770"); // Dec 5 11:59:30
+
 })
 
-app.get('/checkin', ((req, res) =>
+
+app.post('/radiometers/:radiometerID', (req, res) =>
 {
-    // send current timestamp
-    res.send(Date.now())
-}));
+    console.log(req.params.radiometerID)
 
-app.post('/data', (req, res) =>
-{
-    let data = req.body
-
-    for(let idx = 0; idx < length(data.Devices.Thermopiles); idx++)
+    zlib.gunzip(req.body, (err, outbuf) =>
     {
-        for(let sample = 0; sample < length(data.Devices.Thermopiles[idx].Readings); sample++)
+        if (err)
         {
-            data.Devices.Thermopiles[idx].Readings[sample] // push to DB
-        }
-    }
+            console.log(err);
+            let ts = Date.now();
+            let path = './data/radiometer' + req.params.radiometerID + "/errors/" + ts + ".gz";
+            fse.outputFile(path, req.body, (err) =>
+            {
+                if (err)
+                    console.log(err)
+                else
+                    console.log("Saved sensor data")
+            });
 
-    for(let idx = 0; idx < length(data.Devices.Enviromental); idx++)
-    {
-        for(let sample = 0; sample < length(data.Devices.Enviromental[idx].Readings); sample++)
+
+            return;
+        }
+        
+        let msg = HourlyDataMessage.decode(outbuf)
+
+        let startTime = new Date(0);
+        if (msg.dataStart.time === "unixTime")
         {
-            data.Devices.Enviromental[idx].Readings[sample] // push to DB
-        }
-    }
-
-    for(let idx = 0; idx < length(data.Devices.Communication); idx++)
-    {
-        for(let sample = 0; sample < length(data.Devices.Communication[idx].Messages); sample++)
+            // use unix time
+            startTime.setUTCSeconds(msg.dataStart.unixTime)
+        } else if (msg.dataStart.time === "LongVer")
         {
-            data.Devices.Communication[idx].Messages[sample] // push to DB
+            // use long version
+            let long = time.getLongver()
+            startTime.setFullYear(long.year, long.month, long.day)
+            startTime.setHours(long.hour)
+            startTime.setMinutes(long.minute)
+            startTime.setSeconds(long.seconds)
+        } else
+        {
+            // Unknown, drop it
+            return
         }
-    }
+
+        let path = './data/radiometer' + req.params.radiometerID + "/" + startTime.getUTCFullYear() + "/" + (startTime.getUTCMonth() + 1) + "/" + startTime.getUTCDate() + "/h" + startTime.getUTCHours() + ".rpb";
+        
+        fse.outputFile(path, outbuf, (err) =>
+	    {
+		if (err)
+		    console.log(err)
+		else
+		    console.log("Saved raw sensor data")
+	    });
 
 
+        console.log(startTime.toUTCString())
+        path = './data/radiometer' + req.params.radiometerID + "/" + startTime.getUTCFullYear() + "/" + (startTime.getUTCMonth() + 1) + "/" + startTime.getUTCDate() + "/h" + startTime.getUTCHours() + ".json";
+        fse.outputFile(path, JSON.stringify(msg.toJSON() ), (err) =>
+        {
+            if (err)
+                console.log(err)
+            else
+                console.log("Saved sensor data")
+        });
+/*
+        let serialNums = [msg.commsSerial, msg.bmeBoard.serialNumber]
+        for (const sen of msg.sensors)
+        {
+            serialNums.push(sen.serialNumber)
+        }
 
 
-    console.log(req)
-    res.send('OK')
-})
+        const query = "SELECT * FROM Radiometer_Configs WHERE device_fk IN (" + serialNums.join(', ') + ");"
+        console.log(query)
+
+
+        connection.query(query, (err, res, fields) =>
+        {
+            if (err) throw err;
+            console.log(res)
+            if(res.length !== serialNums.length)
+            {
+                console.log("Unknown Device in system, refusing to process");
+                return;
+            }
+            let radNum = res[0].radiometer_fk;
+            for(const row of res)
+            {
+                if(row.radiometer_fk !== radNum)
+                {
+                    console.log("Device not registered to that radiometer, refusing to process");
+                    return;
+                }
+            }
+        })
+*/
+
+    })
+
+
+    // let msg2 = messages.HourlyData.deserializeBinary(req.body)
+    //
+    // let sensors = msg2.getSensorsList()
+    // let sensor0 = sensors[0]
+    //
+    // console.log(sensor0)
+    //
+    // let chan0 = sensor0.getChannelsList()[0].getValuesList()
+    //
+    // console.log(chan0)
+    res.code = 200
+    res.send()
+});
 
 app.listen(port, () =>
 {
-    console.log("starting server")
+    console.log("server started")
 })
+
+
+// fs.readFile("/media/reedt/XTRM-Q/Data/CLionProjects/compressionTester/data/hourly.pb", (err, data) =>
+// {
+//     if(err) throw err;
+//     // console.log(data);
+//     let msg2 = messages.HourlyData.deserializeBinary(data)
+//
+//     let sensors = msg2.getSensorsList()
+//     let sensor0 = sensors[0]
+//
+//     console.log(sensor0)
+//
+//     let chan0 = sensor0.getChannelsList()[0].getValuesList()
+//
+//     console.log(chan0)
+// })
+
+// msg.deserializeBinary()
+
+// msg.setYear(2021)
+

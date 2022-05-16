@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+message TimeStamp{
+	message date{
+	uint32 year = 1;
+	uint32 month = 2;
+	uint32 day = 3;
+	uint32 hour = 4;
+	uint32 minute = 5;
+	uint32 second = 6;
+	}
+	oneof time{
+		date longver = 1;
+		fixed32 unixTime = 2;
+	}
+}
+
+message HourlyData{
+  fixed64 commsSerial = 1;
+  uint32 fwVersion = 2;
+  repeated SensorBoard sensors = 3;
+  EnvironmentalBoard bmeBoard = 4;
+  repeated SystemEvents events = 5;
+	TimeStamp dataStart = 6;
+	uint64 duration = 7;
+
+  message readings {
+    repeated float values = 1;
+  }
+  message SensorBoard {
+    fixed64  serialNumber = 1;
+    uint32 fwVersion = 2;
+    repeated readings channels = 3;
+  }
+  message EnvironmentalBoard {
+    fixed64 serialNumber = 1;
+    uint32 fwVersion = 2;
+    readings windSpeed = 3;
+    readings windDirection = 4;
+    readings humidity = 5;
+    readings pressure = 6;
+    repeated bool rain = 7;
+  }
+  message SystemEvents{
+    enum EventType{
+      LOW_BATTERY = 0;
+      NORMAL_BATTERY = 1;
+      DEVICE_DISCONNECT = 2;
+      DEVICE_CONNECT = 3;
+      LOW_SD_CARD = 4;
+      OTHER = 5;
+    }
+    EventType type = 1;
+    string details = 2;
+    TimeStamp time = 3;
+  }
+}
