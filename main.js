@@ -7,6 +7,7 @@ const app = express()
 const port = 3000
 
 let fse = require('fs-extra');
+const { start } = require("repl");
 /*
 let mysql = require('mysql2')
 const connection = mysql.createConnection(
@@ -97,8 +98,23 @@ app.post('/radiometers/:radiometerID', (req, res) =>
             return
         }
 
-        let path = './data/radiometer' + req.params.radiometerID + "/" + startTime.getUTCFullYear() + "/" + (startTime.getUTCMonth() + 1) + "/" + startTime.getUTCDate() + "/h" + startTime.getUTCHours() + ".rpb";
-        
+        // create variables for zero-padding
+        let fileYear = startTime.getUTCFullYear();
+        let fileMonth = (startTime.getUTCMonth() + 1);
+        let fileDay = startTime.getUTCDate();
+        let fileHour = startTime.getUTCHours();
+        // zero-pad the time variables
+        // let paddedYear = fileYear.toString().padStart(5, '0');  // likely won't need to pad the year for our implementation
+        let paddedMonth = fileMonth.toString().padStart(2, '0');   // month is always 2 digits
+        let paddedDay = fileDay.toString().padStart(2, '0');       // day is always 2 digits
+        let paddedHour = fileHour.toString().padStart(2, '0');     // hour is always 2 digits
+
+        // original implementation below; no padding
+        // let path = './data/radiometer' + req.params.radiometerID + "/" + startTime.getUTCFullYear() + "/" + (startTime.getUTCMonth() + 1) + "/" + startTime.getUTCDate() + "/h" + "0" + startTime.getUTCHours() + ".rpb";
+        // padded implementation below
+        let path = './data/radiometer' + req.params.radiometerID + "/" + fileYear + "/" + paddedMonth + "/" + paddedDay + "/h" + paddedHour + ".rpb";
+
+
         fse.outputFile(path, outbuf, (err) =>
 	    {
 		if (err)
@@ -109,7 +125,10 @@ app.post('/radiometers/:radiometerID', (req, res) =>
 
 
         console.log(startTime.toUTCString())
-        path = './data/radiometer' + req.params.radiometerID + "/" + startTime.getUTCFullYear() + "/" + (startTime.getUTCMonth() + 1) + "/" + startTime.getUTCDate() + "/h" + startTime.getUTCHours() + ".json";
+        // original implementation below; no padding
+        // path = './data/radiometer' + req.params.radiometerID + "/" + startTime.getUTCFullYear() + "/" + (startTime.getUTCMonth() + 1) + "/" + startTime.getUTCDate() + "/h" + "0" + startTime.getUTCHours() + ".json";
+        // padded implementation below
+        path = './data/radiometer' + req.params.radiometerID + "/" + fileYear + "/" + paddedMonth + "/" + paddedDay + "/h" +  paddedHour + ".json";
         fse.outputFile(path, JSON.stringify(msg.toJSON() ), (err) =>
         {
             if (err)
