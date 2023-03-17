@@ -1,6 +1,7 @@
 let protobuf = require("protobufjs");
 
 var bodyParser = require('body-parser')
+const bodyParserErrorHandler = require('express-body-parser-error-handler') // ADDED IN ATTEMPT TO RESOLVE BADREQUESTERROR
 const zlib = require('zlib');
 const express = require('express')
 const app = express()
@@ -42,6 +43,8 @@ app.use(bodyParser.raw(
         limit: '20mb',
         type: 'application/octet-stream'
     }))
+
+app.use(bodyParserErrorHandler()) // ADDED IN ATTEMPT TO RESOLVE BADREQUESTERROR
 
 app.get('/utcnow', (req, res) =>
 {
