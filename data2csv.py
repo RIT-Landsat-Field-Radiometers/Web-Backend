@@ -55,10 +55,10 @@ if __name__ == "__main__":
             filenames.append(path.join(root, name))
 #    print("filenames\n")
 #    print(filenames)
-    if filenames[0] == './Data/output.csv':
-        filenames = filenames[1::2]
-    else:
-        filenames = filenames[0::2]
+#    if filenames[0] == './Data/output.csv':
+#        filenames = filenames[1::2]
+#    else:
+#        filenames = filenames[0::2]
 #    print("no rpb")
 #    print(filenames)
 #    print("sorted by ascending hour number")
