@@ -26,7 +26,7 @@ def find_missing_days(lst):
     return sorted(set(range(lst[0], lst[-1])) - set(lst))
 
 def main():
-    dataRoot = "./data"
+    dataRoot = "../data"
 
     radiometers = os.listdir(dataRoot)
     # print(radiometers)
