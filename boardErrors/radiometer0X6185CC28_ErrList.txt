@@ -1,0 +1,2 @@
+2C - BME board rain data invalid, please check data in S3. Sensor may be in error.
+2D - BME board wind speed data invalid, please check data in S3. Sensor may be in error.

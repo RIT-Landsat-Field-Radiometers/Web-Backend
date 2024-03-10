@@ -21,8 +21,9 @@ message HourlyData{
   repeated SensorBoard sensors = 3;
   EnvironmentalBoard bmeBoard = 4;
   repeated SystemEvents events = 5;
-	TimeStamp dataStart = 6;
-	uint64 duration = 7;
+  TimeStamp dataStart = 6;
+  uint64 duration = 7;
+  uint32 averagingTime = 8;
 
   message readings {
     repeated float values = 1;
@@ -31,6 +32,7 @@ message HourlyData{
     fixed64  serialNumber = 1;
     uint32 fwVersion = 2;
     repeated readings channels = 3;
+    repeated readings internalTemps = 4;
   }
   message EnvironmentalBoard {
     fixed64 serialNumber = 1;
@@ -40,6 +42,7 @@ message HourlyData{
     readings humidity = 5;
     readings pressure = 6;
     repeated bool rain = 7;
+    readings airTemperature = 8;
   }
   message SystemEvents{
     enum EventType{

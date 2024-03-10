@@ -1,0 +1,62 @@
+{
+  "radiometers": [
+    {
+      "id": "0X1E1BFEE6",
+      "name": "Radiometer 1",
+      "location": "West Henrietta, NY",
+      "coordinates": "43.074812, -77.682454",
+      "lastupload": "2023-11-13 00:03:12",
+      "lastreset": "2023-11-13 01:29:06",
+      "errors": [
+        "2C - BME board rain data invalid, please check data in S3. Sensor may be in error.",
+        "2D - BME board wind speed data invalid, please check data in S3. Sensor may be in error."
+      ]
+    },
+    {
+      "id": "0X6185CC28",
+      "name": "Radiometer 2",
+      "location": "Rochester, NY",
+      "coordinates": "43.162567, -77.618305",
+      "lastupload": "2023-09-01 00:11:40",
+      "lastreset": "Wes, 9 Aug 2023 00:10:32 GMT",
+      "errors": [
+        "2C - BME board rain data invalid, please check data in S3. Sensor may be in error.",
+        "2D - BME board wind speed data invalid, please check data in S3. Sensor may be in error."
+      ]
+    },
+    {
+      "id": "0XAF77B198",
+      "name": "Radiometer 3",
+      "location": "Brookings, SD",
+      "coordinates": "44.323582, -96.773912",
+      "lastupload": "2024-03-09 00:02:13",
+      "lastreset": "Wes, 9 Aug 2023 00:10:32 GMT",
+      "errors": [
+        "2C - BME board rain data invalid, please check data in S3. Sensor may be in error.",
+        "2D - BME board wind speed data invalid, please check data in S3. Sensor may be in error."
+      ]
+    },
+    {
+      "id": "0XDCBF5A7F",
+      "name": "Radiometer 4",
+      "location": "La Jolla, CA",
+      "coordinates": "32.840730, -117.265869",
+      "lastupload": "2024-03-10 00:04:59",
+      "lastreset": "Wes, 9 Aug 2023 00:10:32 GMT",
+      "errors": [
+        "None"
+      ]
+    },
+    {
+      "id": "0XU937HEB3",
+      "name": "Radiometer 5",
+      "location": "Bexar County, TX",
+      "coordinates": "29.633545, -98.564433",
+      "lastupload": "Thu, 24 Aug 2023 00:08:21 GMT",
+      "lastreset": "Wes, 9 Aug 2023 00:10:32 GMT",
+      "errors": [
+        "None"
+      ]
+    }
+  ]
+}

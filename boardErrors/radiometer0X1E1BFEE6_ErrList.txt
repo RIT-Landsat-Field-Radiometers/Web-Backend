@@ -1,0 +1,2 @@
+1  - Sensor board data invalid, please check data in S3. Board may be disconnected.
+2  - BME board data invalid, please check data in S3. Board may be disconnected.

@@ -1,0 +1,4 @@
+radiometer0X1E1BFEE6 0
+radiometer0X6185CC28 0
+radiometer0XAF77B198 0
+radiometer0XDCBF5A7F 0
